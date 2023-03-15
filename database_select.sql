@@ -17,7 +17,7 @@ GROUP BY a.name;
 SELECT e.name_executor FROM album a
 LEFT JOIN album_executor ae ON ae.album_id = a.id 
 LEFT JOIN executor e ON e.id = ae.executor_id 
-WHERE a.release_year = 2020
+WHERE a.release_year != 2020
 GROUP BY e.name_executor;
 
 --Названия сборников, в которых присутствует конкретный исполнитель (выберите его сами - 'Michael Jackson') 
@@ -51,10 +51,13 @@ LEFT JOIN track t ON a.id = t.album_id
 WHERE t.duration = (SELECT MIN(duration) FROM track);
 
 --Названия альбомов, содержащих наименьшее количество треков.
-SELECT a.name FROM album a 
-LEFT JOIN track t ON a.id = t.album_id 
+SELECT a.name, COUNT(*) FROM album a
+LEFT JOIN track t ON t.album_id  = a.id 
 GROUP BY a.name
-ORDER BY count(*) ASC
-LIMIT 1;
-
+HAVING COUNT(*) = 
+				(SELECT COUNT(*) FROM album a
+				LEFT JOIN track t ON t.album_id  = a.id
+				GROUP BY a.name
+				ORDER by COUNT(*) 
+				LIMIT 1);
 --select * FROM collections_track
